@@ -5,6 +5,8 @@
 
 std::vector<TSP_NODE> node;
 
+
+// 测试读取 TAP 文件
 char* read_node(char* filename)
 {
     char* line = (char*) malloc(1024);
@@ -18,12 +20,13 @@ char* read_node(char* filename)
     return line;
 }
 
+// 打印节点信息
 void print_node(TSP_NODE pn)
 {
     printf("%f %f %d %d\n", pn.x, pn.y, pn.id, pn.next_node);
 }
 
-
+// 打印节点和线段总数
 void print_node_line_total(char* filename)
 {
     TSP_NODE_LINE tsp;
@@ -40,20 +43,33 @@ void print_node_line_total(char* filename)
 }
 
 
+// 复制剪贴板前把换行替换成空格
+size_t newline_to_space(char* str)
+{
+    char* eos = str;
+    size_t cnt = 0;
+    while (*eos++) {
+        if (*eos == '\n') {
+            *eos = ' ';
+            cnt += 1;
+        }
+    }
+    return cnt;
+}
+
+// 读取TSP，排序和写文件和复制到剪贴板
+
 int read_tsp_to_vecter(char* filename)
 {
 
     TSP_NODE_LINE tsp;
     TSP_NODE pn;
     FILE* file = fopen(filename, "r");
-    FILE* tmpf = fopen("TSP.txt", "w+");
+    FILE* tmpf = fopen("C:\\TSP\\TSP.txt", "w+");
 
 
     fscanf(file, "%d %d\n", &tsp.node_total, &tsp.line_total);
     printf("%d %d\n", tsp.node_total, tsp.line_total);
-
-    if (tsp.node_total != tsp.line_total)
-        return 0;
 
     fprintf(tmpf, "%d %d\n", tsp.node_total, tsp.line_total);
 
@@ -71,7 +87,7 @@ int read_tsp_to_vecter(char* filename)
         fscanf(file, "%d %d %d\n", &id, &next_node, &fork);
         node[id].next_node = next_node;
 
-      //  printf("%f %f %d %d\n", node[id].x, node[id].y, node[id].id, node[id].next_node);
+        //  printf("%f %f %d %d\n", node[id].x, node[id].y, node[id].id, node[id].next_node);
         fprintf(tmpf, "%f %f\n", node[id].x, node[id].y);
     }
 
@@ -81,8 +97,8 @@ int read_tsp_to_vecter(char* filename)
 //    }
 
     fclose(file);
-    fseek (tmpf, 0, SEEK_END);   // non-portable
-    int fsize=ftell (tmpf);
+    fseek(tmpf, 0, SEEK_END);    // non-portable
+    int fsize = ftell(tmpf);
 
 
     rewind(tmpf);
@@ -90,10 +106,13 @@ int read_tsp_to_vecter(char* filename)
     char* buf = (char*) malloc(fsize);
     memset(buf, 0, fsize);
 
-    fseek (tmpf , 0, SEEK_SET );
-    fread(buf, 1, fsize-1 , tmpf);
+    fseek(tmpf, 0, SEEK_SET);
+    fread(buf, 1, fsize - 1, tmpf);
 
     printf("%s", buf);
+
+    newline_to_space(buf);
+
     CopyTextToClipboard(buf);
     free(buf);
     fclose(tmpf);
