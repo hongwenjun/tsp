@@ -14,9 +14,10 @@ int main()
 
 
     int ret = read_tsp_to_vecter(filename);
-    if (ret > 200){
+    ret += read_tsp_to_lines(filename);
+    if (ret > 400){
        system("start  https://262235.xyz/index.php/tag/vba/");
-       system("start  C:\\TSP\\TSP.txt");;
+//       system("start  C:\\TSP\\TSP.txt");;
        }
     return 0;
 }

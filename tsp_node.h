@@ -26,5 +26,6 @@ void print_node(TSP_NODE pn);
 void print_node_line_total(char* filename);
 
 int read_tsp_to_vecter(char* filename);
+int read_tsp_to_lines(char* filename);
 
 #endif // TSP_NODE_H_INCLUDED

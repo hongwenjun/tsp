@@ -69,7 +69,7 @@ int read_tsp_to_vecter(char* filename)
 
 
     fscanf(file, "%d %d\n", &tsp.node_total, &tsp.line_total);
-    printf("%d %d\n", tsp.node_total, tsp.line_total);
+  //  printf("%d %d\n", tsp.node_total, tsp.line_total);
 
     fprintf(tmpf, "%d %d\n", tsp.node_total, tsp.line_total);
 
@@ -117,6 +117,60 @@ int read_tsp_to_vecter(char* filename)
     free(buf);
     fclose(tmpf);
     return tsp.node_total;
+}
+
+
+int read_tsp_to_lines(char* filename)
+{
+
+    TSP_NODE_LINE tsp;
+    TSP_NODE pn;
+    FILE* file = fopen(filename, "r");
+    FILE* tmpf = fopen("C:\\TSP\\TSP2.txt", "w+");
+
+
+    fscanf(file, "%d %d\n", &tsp.node_total, &tsp.line_total);
+    fprintf(tmpf, "%d %d\n", tsp.node_total, tsp.line_total);
+
+    for (auto i = 0 ; i != tsp.node_total ; i++) {
+        fscanf(file, "%lf %lf\n", &pn.x, &pn.y);
+        pn.id = i;
+        pn.next_node = 0;
+        node.push_back(pn);
+    }
+
+    int id;
+    int next_node;
+    int fork;
+    for (auto i = 0 ; i != tsp.line_total ; i++) {
+        fscanf(file, "%d %d %d\n", &id, &next_node, &fork);
+        node[id].next_node = next_node;
+
+        //  printf("%f %f %d %d\n", node[id].x, node[id].y, node[id].id, node[id].next_node);
+        fprintf(tmpf, "%f %f %f %f\n", node[id].x, node[id].y, node[next_node].x, node[next_node].y);
+    }
+
+    fclose(file);
+    fseek(tmpf, 0, SEEK_END);    // non-portable
+    int fsize = ftell(tmpf);
+
+
+    rewind(tmpf);
+
+    char* buf = (char*) malloc(fsize);
+    memset(buf, 0, fsize);
+
+    fseek(tmpf, 0, SEEK_SET);
+    fread(buf, 1, fsize - 1, tmpf);
+
+    printf("%s", buf);
+
+    newline_to_space(buf);
+
+    CopyTextToClipboard(buf);
+    free(buf);
+    fclose(tmpf);
+    return tsp.line_total;
 }
 
 
