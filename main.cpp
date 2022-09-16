@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <windows.h>
 #include "tsp_node.h"
+#include "base64.h"
+#include <string>
 
 int main()
 {
     char filename[] = "C:\\TSP\\CDR_TO_TSP";
+    std::string web_base64 = "c3RhcnQgIGh0dHBzOi8vMjYyMjM1Lnh5ei9pbmRleC5waHAvdGFnL3ZiYS8=";
+    std::string vba_262235 = base64_decode(web_base64);
 
     char buf[64];
     FILE* file = fopen(filename, "r");
@@ -12,13 +16,11 @@ int main()
         system("mkdir C:\\TSP\\");
     }
 
-
     int ret = read_tsp_to_vecter(filename);
     ret += read_tsp_to_lines(filename);
-    if (ret > 400){
-       system("start  https://262235.xyz/index.php/tag/vba/");
-//       system("start  C:\\TSP\\TSP.txt");;
-       }
+    if (ret > 400) {
+        system(vba_262235.c_str());
+    }
     return 0;
 }
 
@@ -37,5 +39,10 @@ print_node_line_total(filename);
 // 读取文件测试
 read_node(filename);
 
+std::string web = "start  https://262235.xyz/index.php/tag/vba/";
+std::string encoded = base64_encode(web);
+printf("%s\n", encoded.c_str());
+std::string decoded = base64_decode(encoded);
+printf("%s\n", decoded.c_str()) ;
 #endif
 
