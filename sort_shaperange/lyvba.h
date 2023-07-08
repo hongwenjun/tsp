@@ -3,8 +3,8 @@
 
 
 typedef struct ShapeProperties {
-    long Item;          // ShapeRange.Item
-    long StaticID;      // Shape.StaticID
+    int Item;          // ShapeRange.Item
+    int StaticID;      // Shape.StaticID
     double lx, rx;      // s.LeftX  s.RightX  s.BottomY  s.TopY
     double by, ty;
     double cx, cy;      // s.CenterX  s.CenterY s.SizeWidth s.SizeHeight
@@ -22,10 +22,6 @@ enum SortItem {
   stsh,
   area
 };
-
-extern "C" __declspec(dllexport)
-int __stdcall SortByItem(char* Stored_File, SortItem Sort_By);
-
 
 
 #endif // LYVBA_H_INCLUDED
