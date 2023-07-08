@@ -20,10 +20,9 @@ using std::sort;
 bool srvec_sort_by_item(vector<ShapeProperties>& srvec, SortItem Sort_By);
 
 // Private Declare PtrSafe Function SortByItem Lib "C:\TSP\lyvba.dll" (ByVal Stored_File As String, ByVal Sort_By As SortItem) As Long
-extern "C" __declspec(dllexport)
-int __stdcall SortByItem(ShapeProperties* sr_Array, int size, SortItem Sort_By, int* ret_Array)
+extern "C"
+__declspec(dllexport) int WINAPI sort_byitem(ShapeProperties* sr_Array, int size, SortItem Sort_By, int* ret_Array)
 {
-    struct ShapeProperties sp;
     vector <ShapeProperties> srvec;
     FILE* pFile;
     pFile = fopen("C:\\TSP\\TSP.txt", "w");
@@ -40,16 +39,16 @@ int __stdcall SortByItem(ShapeProperties* sr_Array, int size, SortItem Sort_By, 
     bool sort_flage = srvec_sort_by_item(srvec, Sort_By);
 
     // 遍历 vector 输出排序后的结果
-    for (const auto& sh : srvec) {
-        fprintf(pFile, "%lf %lf \n", sh.cx, sh.cy);
+    for (auto it = srvec.begin(); it != srvec.end(); it++) {
+        fprintf(pFile, "%lf %lf \n", it->cx, it->cy);
     }
 
     if (sort_flage) {
-        FILE* fp = fopen("R:\\ret.dat", "w+");
+        FILE* fp = fopen("C:\\TSP\\ret.dat", "w+");
         fprintf(fp, "%d\n", size);
-        for (const auto& sh : srvec) {
-            fprintf(fp, "%d ", sh.Item);
-            *ret_Array = sh.Item;
+        for (auto it = srvec.begin(); it != srvec.end(); it++) {
+            fprintf(fp, "%d ", it->Item);
+            *ret_Array = it->Item;
             ret_Array++;
         }
         fclose(fp);
