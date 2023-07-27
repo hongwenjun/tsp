@@ -16,9 +16,15 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-std=c++11" />
+					<Add option="-m64" />
+					<Add directory="C:/TDM-GCC-64/x86_64-w64-mingw32/lib" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+					<Add option="-m64" />
+					<Add library="liboleaut32.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -26,6 +32,7 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="i18n.cpp" />
 		<Unit filename="lyvba.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>

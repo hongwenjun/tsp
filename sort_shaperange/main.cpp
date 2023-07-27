@@ -1,8 +1,29 @@
-#include <windows.h>
+﻿#include <windows.h>
 #include <stdio.h>
 #include "lyvba.h"
-#include <vector>
-#include <algorithm>
+
+bool srvec_sort_by_item(vector<ShapeProperties>& srvec, SortItem Sort_By);
+
+extern "C" __declspec(dllexport)
+int __stdcall sort_byitem(ShapeProperties* sr_Array, int size, SortItem Sort_By, int* ret_Array)
+{
+    vector <ShapeProperties> srvec;
+    // vector 容器装载 ShapeProperties* sr_Array
+    for (auto i = 0 ; i != size; i++) {
+        srvec.push_back(*sr_Array);
+        sr_Array++;
+    }
+
+    // 排序 按 SortItem 项目
+    bool sort_flage = srvec_sort_by_item(srvec, Sort_By);
+    if (sort_flage) {
+        for (auto it = srvec.begin(); it != srvec.end(); it++) {
+            *ret_Array = it->Item;
+            ret_Array++;
+        }
+    }
+    return size;
+}
 
 // SortItem 排序项目 比较函数
 bool lx_cmp(const SHPS& shape1, const SHPS& shape2) {return shape1.lx < shape2.lx;}
@@ -14,56 +35,7 @@ bool cy_cmp(const SHPS& shape1, const SHPS& shape2) {return shape1.cy < shape2.c
 bool sw_cmp(const SHPS& shape1, const SHPS& shape2) {return shape1.sw < shape2.sw;}
 bool sh_cmp(const SHPS& shape1, const SHPS& shape2) {return shape1.sh < shape2.sh;}
 bool area_cmp(const SHPS& shape1, const SHPS& shape2) {return shape1.sw * shape1.sh < shape2.sw * shape2.sh;}
-
-using std::vector;
-using std::sort;
-bool srvec_sort_by_item(vector<ShapeProperties>& srvec, SortItem Sort_By);
-
-// Private Declare PtrSafe Function SortByItem Lib "C:\TSP\lyvba.dll" (ByVal Stored_File As String, ByVal Sort_By As SortItem) As Long
-extern "C"
-__declspec(dllexport) int WINAPI sort_byitem(ShapeProperties* sr_Array, int size, SortItem Sort_By, int* ret_Array)
-{
-    vector <ShapeProperties> srvec;
-    FILE* pFile;
-    pFile = fopen("C:\\TSP\\TSP.txt", "w");
-    fprintf(pFile, "%d  %d\n", size, size);
-
-    // vector 容器装载 ShapeProperties* sr_Array
-    for (auto i = 0 ; i != size; i++) {
-        srvec.push_back(*sr_Array);
-        sr_Array++;
-
-    }
-
-    // 排序 按 SortItem 项目
-    bool sort_flage = srvec_sort_by_item(srvec, Sort_By);
-
-    // 遍历 vector 输出排序后的结果
-    for (auto it = srvec.begin(); it != srvec.end(); it++) {
-        fprintf(pFile, "%lf %lf \n", it->cx, it->cy);
-    }
-
-    if (sort_flage) {
-        FILE* fp = fopen("C:\\TSP\\ret.dat", "w+");
-        fprintf(fp, "%d\n", size);
-        for (auto it = srvec.begin(); it != srvec.end(); it++) {
-            fprintf(fp, "%d ", it->Item);
-            *ret_Array = it->Item;
-            ret_Array++;
-        }
-        fclose(fp);
-    }
-
-    fclose(pFile);
-    return size;
-}
-
-
-//  Private Declare PtrSafe Function SayHello Lib "C:\TSP\lyvba.dll" (ByVal name As String) As Long
-void __stdcall SayHello(char* name)
-{
-    MessageBoxA(NULL, name, "Greetings", MB_OK);
-}
+bool topWt_left_cmp(const SHPS& shape1, const SHPS& shape2) {return shape1.ty*100 - shape1.lx > shape2.ty*100  - shape2.lx;}
 
 bool srvec_sort_by_item(vector <struct ShapeProperties>& srvec, SortItem Sort_By)
 {
@@ -94,6 +66,9 @@ bool srvec_sort_by_item(vector <struct ShapeProperties>& srvec, SortItem Sort_By
         break;
     case area:
         sort(srvec.begin(), srvec.end(), area_cmp);
+        break;
+    case topWt_left:
+        sort(srvec.begin(), srvec.end(), topWt_left_cmp);
         break;
     default:
         break;

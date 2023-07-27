@@ -1,5 +1,14 @@
 #ifndef LYVBA_H_INCLUDED
 #define LYVBA_H_INCLUDED
+#include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
+using std::vector;
+using std::sort;
+using std::string;
+using std::map;
+
 typedef struct ShapeProperties {
     int Item;          // ShapeRange.Item
     int StaticID;      // Shape.StaticID
@@ -18,10 +27,15 @@ enum SortItem {
   stcy,
   stsw,
   stsh,
-  area
+  area,
+  topWt_left
 };
 
+// Private Declare PtrSafe Function SortByItem Lib "C:\TSP\lyvba.dll" (ByVal Stored_File As String, ByVal Sort_By As SortItem) As Long
 extern "C" __declspec(dllexport)
 int __stdcall sort_byitem(ShapeProperties* sr_Array, int size, SortItem Sort_By, int* ret_Array);
+
+//  i18n 是指国际化 Internationalization 的缩写，是一种让软件可以轻松适应不同语言和地区的技术。
+extern "C" __declspec(dllexport) BSTR __stdcall i18n(BSTR english, int code);
 
 #endif // LYVBA_H_INCLUDED
