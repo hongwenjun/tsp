@@ -16,7 +16,7 @@ BOOL IsFileExist(LPCTSTR lpFileName)
 // 功能 获得当前路径
 char* get_dll_dir(char* szPath)
 {
-    HMODULE hModule = GetModuleHandle("lyvba.dll");
+    HMODULE hModule = GetModuleHandle("lyvba32.dll");
 
     char* ret = szPath;
     if (hModule != NULL) {

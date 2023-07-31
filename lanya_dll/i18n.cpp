@@ -2,9 +2,11 @@
 #include <oleauto.h>
 #include <string.h>
 #include "lyvba.h"
+#include "utf8.h"
 
 #define MAX_LINE_LENGTH 1024
 static int api_count = 0;
+BSTR pbs = NULL;
 
 BSTR CharToBSTR(const char* str);
 void load_lang_file(const char* filename);
@@ -42,6 +44,8 @@ extern "C" __declspec(dllexport) BSTR __stdcall i18n(BSTR english, int code)
 
 BSTR CharToBSTR(const char* str)
 {
+    if (api_count > 2) SysFreeString(pbs);
+
     // 获取char*字符串的长度（以字节为单位）
     int len = strlen(str);
 
@@ -50,6 +54,9 @@ BSTR CharToBSTR(const char* str)
 
     // 将char*字符串的内容逐字节复制到BSTR字符串中
     memcpy(bstr, str, len);
+
+    pbs =  bstr;
+
     return bstr;
 }
 
@@ -59,11 +66,11 @@ bool init_translations()
         return true;
     char filename[256] = "";
     get_dll_dir(filename);
-    strcat(filename,"\\lang_cn.ini");
+    strcat(filename, "\\lang_cn.ini");
 
     if (IsFileExist(filename)) {
         load_lang_file(filename);
-    //    MessageBoxA(NULL, filename, "Language File", MB_OK);
+        //    MessageBoxA(NULL, filename, "Language File", MB_OK);
     }
     return true;
 }
@@ -76,8 +83,14 @@ void load_lang_file(const char* filename)
         translations.erase(translations.begin(), translations.end());
 
         char line[MAX_LINE_LENGTH];
+        char gbk_line[MAX_LINE_LENGTH];
+        memset(line, 0, MAX_LINE_LENGTH);
+        memset(gbk_line, 0, MAX_LINE_LENGTH);
+
         while (fgets(line, MAX_LINE_LENGTH, file) != NULL) {
-            char* key = strtok(line, "=");
+            utf8_to_gb(line, gbk_line, strlen(line));
+
+            char* key = strtok(gbk_line, "=");
             char* value = strtok(NULL, "\n");
             if (key != NULL && value != NULL) {
                 translations.insert(std::pair<string, string>(string(key), string(value)));
