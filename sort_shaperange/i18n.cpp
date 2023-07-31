@@ -1,10 +1,14 @@
 #include <Windows.h>
 #include <oleauto.h>
-
-#include "lyvba.h"
 #include <string.h>
+#include "lyvba.h"
+
+#define MAX_LINE_LENGTH 1024
+static int api_count = 0;
 
 BSTR CharToBSTR(const char* str);
+void load_lang_file(const char* filename);
+bool init_translations();
 
 map<string, string> translations = {
     {"Batch Dimension Nodes", "批量标注节点"},
@@ -21,6 +25,11 @@ map<string, string> translations = {
 
 extern "C" __declspec(dllexport) BSTR __stdcall i18n(BSTR english, int code)
 {
+    if (!(api_count)) {
+        init_translations();
+        api_count++;
+    }
+
     if (code == 2052) {
         string key = string((char*)english);
         auto it = translations.find(key);
@@ -28,7 +37,7 @@ extern "C" __declspec(dllexport) BSTR __stdcall i18n(BSTR english, int code)
             return CharToBSTR(it->second.c_str());
         }
     }
-    return english;
+    return CharToBSTR((char*)english);
 }
 
 BSTR CharToBSTR(const char* str)
@@ -41,6 +50,41 @@ BSTR CharToBSTR(const char* str)
 
     // 将char*字符串的内容逐字节复制到BSTR字符串中
     memcpy(bstr, str, len);
-
     return bstr;
+}
+
+bool init_translations()
+{
+    if (api_count)
+        return true;
+    char filename[256] = "";
+    get_dll_dir(filename);
+    strcat(filename,"\\lang_cn.ini");
+
+    if (IsFileExist(filename)) {
+        load_lang_file(filename);
+    //    MessageBoxA(NULL, filename, "Language File", MB_OK);
+    }
+    return true;
+}
+
+void load_lang_file(const char* filename)
+{
+    FILE* file = fopen(filename, "r");
+    if (file != NULL) {
+        // 清空DLL内置字典，再从文件中加载
+        translations.erase(translations.begin(), translations.end());
+
+        char line[MAX_LINE_LENGTH];
+        while (fgets(line, MAX_LINE_LENGTH, file) != NULL) {
+            char* key = strtok(line, "=");
+            char* value = strtok(NULL, "\n");
+            if (key != NULL && value != NULL) {
+                translations.insert(std::pair<string, string>(string(key), string(value)));
+            }
+        }
+        fclose(file);
+    } else {
+        fprintf(stderr, "Failed to open language file: %s\n", filename);
+    }
 }

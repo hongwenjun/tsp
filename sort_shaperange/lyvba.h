@@ -31,11 +31,20 @@ enum SortItem {
   topWt_left
 };
 
+
+
 // Private Declare PtrSafe Function SortByItem Lib "C:\TSP\lyvba.dll" (ByVal Stored_File As String, ByVal Sort_By As SortItem) As Long
 extern "C" __declspec(dllexport)
 int __stdcall sort_byitem(ShapeProperties* sr_Array, int size, SortItem Sort_By, int* ret_Array);
 
 //  i18n 是指国际化 Internationalization 的缩写，是一种让软件可以轻松适应不同语言和地区的技术。
 extern "C" __declspec(dllexport) BSTR __stdcall i18n(BSTR english, int code);
+
+
+// 功能 获得当前路径和获得当前路径
+char* get_dll_dir(char* szPath);
+BOOL IsFileExist(LPCTSTR lpFileName);
+
+
 
 #endif // LYVBA_H_INCLUDED
